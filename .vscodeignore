@@ -1,0 +1,9 @@
+.vscode/**
+.claude/**
+src/**
+node_modules/**
+tsconfig.json
+esbuild.mjs
+**/*.map
+llms.txt
+llms-small.txt

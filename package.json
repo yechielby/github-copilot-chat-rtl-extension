@@ -1,0 +1,83 @@
+{
+  "name": "copilot-chat-rtl",
+  "displayName": "GitHub Copilot Chat RTL Support",
+  "description": "Adds an ⇄ toggle button to GitHub Copilot Chat that switches messages to right-aligned RTL for Hebrew, Arabic & Persian while keeping code blocks and UI in LTR. Works in VS Code, Cursor & Antigravity.",
+  "version": "0.1.0",
+  "publisher": "yechielby",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YechielBy/github-copilot-chat-rtl-extension"
+  },
+  "homepage": "https://github.com/yechielby/github-copilot-chat-rtl-extension#readme",
+  "bugs": {
+    "url": "https://github.com/yechielby/github-copilot-chat-rtl-extension/issues"
+  },
+  "engines": {
+    "vscode": "^1.94.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "arabic",
+    "arabic-language",
+    "bidi",
+    "bidirectional",
+    "copilot",
+    "copilot-chat",
+    "cursor",
+    "cursor-extension",
+    "cursor-ide",
+    "farsi",
+    "farsi-language",
+    "github-copilot",
+    "hebrew",
+    "hebrew-language",
+    "persian",
+    "persian-language",
+    "rtl",
+    "rtl-support",
+    "vs-code",
+    "vscode",
+    "vscode-extension",
+    "antigravity"
+  ],
+  "extensionDependencies": [
+    "GitHub.copilot-chat"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "icon": "copilot-chat-rtl-logo.png",
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "copilot-rtl.add",
+        "title": "Copilot Chat RTL: Activate RTL"
+      },
+      {
+        "command": "copilot-rtl.remove",
+        "title": "Copilot Chat RTL: Deactivate RTL"
+      },
+      {
+        "command": "copilot-rtl.status",
+        "title": "Copilot Chat RTL: Check Status"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.mjs --production",
+    "watch": "node esbuild.mjs --watch",
+    "compile": "node esbuild.mjs",
+    "package": "npx @vscode/vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.94.0",
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.7.0"
+  }
+}
