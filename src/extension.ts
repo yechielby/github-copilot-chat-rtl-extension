@@ -50,7 +50,7 @@ async function promptRestartIfChanged(changed: boolean): Promise<void> {
 async function handleAdd(): Promise<void> {
     const installations = await findIdeInstallations();
     if (installations.length === 0) {
-        vscode.window.showWarningMessage('No IDE installations found (VS Code, Cursor, or Antigravity).');
+        vscode.window.showWarningMessage('Could not locate IDE installation files.');
         return;
     }
 
@@ -79,7 +79,7 @@ async function handleAdd(): Promise<void> {
 async function handleRemove(): Promise<void> {
     const installations = await findIdeInstallations();
     if (installations.length === 0) {
-        vscode.window.showWarningMessage('No IDE installations found (VS Code, Cursor, or Antigravity).');
+        vscode.window.showWarningMessage('Could not locate IDE installation files.');
         return;
     }
 
@@ -108,7 +108,7 @@ async function handleRemove(): Promise<void> {
 async function handleStatus(): Promise<void> {
     const installations = await findIdeInstallations();
     if (installations.length === 0) {
-        vscode.window.showWarningMessage('No IDE installations found (VS Code, Cursor, or Antigravity).');
+        vscode.window.showWarningMessage('Could not locate IDE installation files.');
         return;
     }
 
@@ -136,7 +136,7 @@ async function handleStatus(): Promise<void> {
 async function handleToggle(): Promise<void> {
     const installations = await findIdeInstallations();
     if (installations.length === 0) {
-        vscode.window.showWarningMessage('No IDE installations found (VS Code, Cursor, or Antigravity).');
+        vscode.window.showWarningMessage('Could not locate IDE installation files.');
         return;
     }
 

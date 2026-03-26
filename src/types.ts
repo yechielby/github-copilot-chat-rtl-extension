@@ -3,7 +3,7 @@ export type RtlMode = 'inactive' | 'active';
 
 /** Represents a discovered IDE installation with workbench files */
 export interface IdeInstallation {
-    /** IDE name: "VS Code" | "Cursor" | "Antigravity" */
+    /** IDE display name from vscode.env.appName */
     ideName: string;
     /** Full path to workbench.html */
     workbenchHtmlPath: string;

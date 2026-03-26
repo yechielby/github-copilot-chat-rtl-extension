@@ -2,18 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { IdeInstallation, RtlStatus } from './types.js';
 import { RTL_CSS, RTL_JS, CSS_FILENAME, JS_FILENAME, HTML_LINK_MARKER } from './content.js';
-
-/**
- * Check if a path exists.
- */
-async function exists(p: string): Promise<boolean> {
-    try {
-        await fs.access(p);
-        return true;
-    } catch {
-        return false;
-    }
-}
+import { exists } from './utils.js';
 
 /**
  * Check if RTL is installed in workbench.html (by checking for the CSS link marker).
@@ -62,12 +51,10 @@ async function removeChecksum(installation: IdeInstallation, messages: string[])
         const product = JSON.parse(content);
 
         if (product.checksums && product.checksums[installation.checksumKey]) {
-            // Create backup first
+            // Always refresh backup so it matches the current IDE version
             const backupPath = installation.productJsonPath + '.bak';
-            if (!(await exists(backupPath))) {
-                await fs.copyFile(installation.productJsonPath, backupPath);
-                messages.push(`  product.json: Backup created`);
-            }
+            await fs.copyFile(installation.productJsonPath, backupPath);
+            messages.push(`  product.json: Backup saved`);
 
             delete product.checksums[installation.checksumKey];
             await fs.writeFile(installation.productJsonPath, JSON.stringify(product, null, '\t'), 'utf-8');
@@ -117,12 +104,11 @@ export async function addRtl(installation: IdeInstallation): Promise<{ messages:
     }
 
     try {
-        // 1. Create backup of workbench.html
+        // 1. Create/refresh backup of workbench.html (always overwrite so backup
+        //    stays current after IDE updates that replace workbench.html)
         const htmlBackupPath = installation.workbenchHtmlPath + '.bak';
-        if (!(await exists(htmlBackupPath))) {
-            await fs.copyFile(installation.workbenchHtmlPath, htmlBackupPath);
-            messages.push(`  workbench.html: Backup created`);
-        }
+        await fs.copyFile(installation.workbenchHtmlPath, htmlBackupPath);
+        messages.push(`  workbench.html: Backup saved`);
 
         // 2. Write CSS file to workbench directory
         const cssPath = path.join(installation.workbenchDir, CSS_FILENAME);
@@ -265,6 +251,20 @@ export async function reinjectAssets(
     try {
         const cssPath = path.join(installation.workbenchDir, CSS_FILENAME);
         const jsPath = path.join(installation.workbenchDir, JS_FILENAME);
+
+        // Compare on-disk content with bundled content to avoid unnecessary restarts
+        let cssMatch = false;
+        let jsMatch = false;
+        try {
+            cssMatch = (await fs.readFile(cssPath, 'utf-8')) === RTL_CSS;
+            jsMatch = (await fs.readFile(jsPath, 'utf-8')) === RTL_JS;
+        } catch { /* file missing — will be written */ }
+
+        if (cssMatch && jsMatch) {
+            messages.push(`  CSS/JS: Already up to date`);
+            return { messages, changed: false };
+        }
+
         await fs.writeFile(cssPath, RTL_CSS, 'utf-8');
         await fs.writeFile(jsPath, RTL_JS, 'utf-8');
         messages.push(`  CSS/JS: Re-written to ${installation.workbenchDir}`);
