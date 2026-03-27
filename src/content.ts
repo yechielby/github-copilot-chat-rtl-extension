@@ -84,6 +84,12 @@ body.copilot-chat-rtl .interactive-input-editor .view-line {
     padding-right: 10px;
 }
 
+/* Force inner spans to fill the full line width so mouse selection works
+   across the entire row, not just the text's inline width */
+body.copilot-chat-rtl .interactive-input-editor .view-line > span {
+    width: 100%;
+}
+
 /* When placeholder is showing (ced spans are :empty — no text, only ::after) keep LTR */
 body.copilot-chat-rtl .interactive-input-editor .view-line:has(> span > span[class*="ced-"]:empty) {
     direction: ltr !important;
