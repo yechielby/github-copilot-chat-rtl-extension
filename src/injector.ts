@@ -93,14 +93,15 @@ async function restoreProductJson(installation: IdeInstallation, messages: strin
  * Add RTL support to a single IDE installation.
  * Returns status messages and whether changes were made.
  */
-export async function addRtl(installation: IdeInstallation): Promise<{ messages: string[]; changed: boolean }> {
+export async function addRtl(installation: IdeInstallation): Promise<{ messages: string[]; changed: boolean; permissionError: boolean }> {
     const messages: string[] = [];
     let changed = false;
+    let permissionError = false;
 
     // Check if already installed
     if (await isInstalled(installation)) {
         messages.push(`  RTL already installed in ${installation.ideName}`);
-        return { messages, changed };
+        return { messages, changed, permissionError: false };
     }
 
     try {
@@ -157,6 +158,7 @@ export async function addRtl(installation: IdeInstallation): Promise<{ messages:
     } catch (e: unknown) {
         const err = e as NodeJS.ErrnoException;
         if (err.code === 'EPERM' || err.code === 'EACCES') {
+            permissionError = true;
             messages.push(`  Permission denied: ${installation.workbenchHtmlPath}`);
             messages.push('  Try running with elevated privileges (Run as Administrator)');
         } else {
@@ -164,7 +166,7 @@ export async function addRtl(installation: IdeInstallation): Promise<{ messages:
         }
     }
 
-    return { messages, changed };
+    return { messages, changed, permissionError };
 }
 
 /**
@@ -242,10 +244,10 @@ export async function removeRtl(installation: IdeInstallation): Promise<{ messag
  */
 export async function reinjectAssets(
     installation: IdeInstallation,
-): Promise<{ messages: string[]; changed: boolean }> {
+): Promise<{ messages: string[]; changed: boolean; permissionError: boolean }> {
     const messages: string[] = [];
     if (!(await isInstalled(installation))) {
-        return { messages, changed: false };
+        return { messages, changed: false, permissionError: false };
     }
 
     try {
@@ -262,15 +264,17 @@ export async function reinjectAssets(
 
         if (cssMatch && jsMatch) {
             messages.push(`  CSS/JS: Already up to date`);
-            return { messages, changed: false };
+            return { messages, changed: false, permissionError: false };
         }
 
         await fs.writeFile(cssPath, RTL_CSS, 'utf-8');
         await fs.writeFile(jsPath, RTL_JS, 'utf-8');
         messages.push(`  CSS/JS: Re-written to ${installation.workbenchDir}`);
-        return { messages, changed: true };
+        return { messages, changed: true, permissionError: false };
     } catch (e: unknown) {
-        messages.push(`  Reinject failed: ${(e as Error).message}`);
-        return { messages, changed: false };
+        const err = e as { code?: string; message: string };
+        const permissionError = err.code === 'EPERM' || err.code === 'EACCES';
+        messages.push(`  Reinject failed: ${err.message}`);
+        return { messages, changed: false, permissionError };
     }
 }

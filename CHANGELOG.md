@@ -2,6 +2,15 @@
 
 All notable changes to the **GitHub Copilot Chat RTL Support** extension will be documented in this file.
 
+## [0.1.2] - 2026-04-20
+
+### Fixed
+
+- Clear error message with actionable fix when permission denied on macOS (copy `chown` command to clipboard)
+- Silent injection failures now show visible error notifications instead of failing quietly
+- Auto-reactivation correctly reports errors after IDE restart
+- Error logs now written to Output panel instead of invisible console
+
 ## [0.1.1] - 2025-03-27
 
 ### Fixed

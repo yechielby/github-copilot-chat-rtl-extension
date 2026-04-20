@@ -2,7 +2,7 @@
   "name": "copilot-chat-rtl",
   "displayName": "GitHub Copilot Chat RTL Support",
   "description": "Adds an ⇄ toggle button to GitHub Copilot Chat that switches messages to right-aligned RTL for Hebrew, Arabic & Persian while keeping code blocks and UI in LTR. Works in VS Code, Cursor & Antigravity.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "yechielby",
   "license": "MIT",
   "repository": {

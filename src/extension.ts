@@ -34,6 +34,27 @@ function getSavedMode(): RtlMode {
  * Workbench HTML/CSS/JS live on disk under the IDE app — the whole IDE must often be restarted,
  * not only the window, for those files to load reliably.
  */
+async function showPermissionError(workbenchPath: string): Promise<void> {
+    const isMac = vscode.env.appHost === 'desktop' && workbenchPath.includes('.app/');
+    if (isMac) {
+        const appMatch = workbenchPath.match(/\/[^/]+\.app\//);
+        const appPath = appMatch ? workbenchPath.substring(0, appMatch.index! + appMatch[0].length - 1) : '/Applications/Visual Studio Code.app';
+        const cmd = `sudo chown -R $(whoami) "${appPath}"`;
+        const action = await vscode.window.showErrorMessage(
+            'Copilot Chat RTL: Permission denied. This is normal on macOS — a one-time fix is needed.',
+            'Copy Fix Command',
+        );
+        if (action === 'Copy Fix Command') {
+            await vscode.env.clipboard.writeText(cmd);
+            vscode.window.showInformationMessage('Command copied! Paste it in Terminal, then fully quit and reopen the IDE.');
+        }
+    } else {
+        vscode.window.showErrorMessage(
+            'Copilot Chat RTL: Permission denied. Try running VS Code as Administrator.',
+        );
+    }
+}
+
 async function promptRestartIfChanged(changed: boolean): Promise<void> {
     if (!changed) return;
     await updateStatusBar();
@@ -59,20 +80,26 @@ async function handleAdd(): Promise<void> {
     channel.appendLine('Activating Copilot Chat RTL support...\n');
 
     let anyChanged = false;
+    let anyPermissionError = false;
     for (const inst of installations) {
         channel.appendLine(`[${inst.ideName}]`);
         const result = await addRtl(inst);
         result.messages.forEach(m => channel.appendLine(m));
         channel.appendLine('');
         if (result.changed) anyChanged = true;
+        if (result.permissionError) anyPermissionError = true;
     }
 
     channel.show(true);
     await saveMode('active');
-    await promptRestartIfChanged(anyChanged);
 
-    if (!anyChanged) {
-        vscode.window.showInformationMessage('Copilot Chat RTL is already active.');
+    if (anyPermissionError) {
+        showPermissionError(installations[0].workbenchHtmlPath);
+    } else {
+        await promptRestartIfChanged(anyChanged);
+        if (!anyChanged) {
+            vscode.window.showInformationMessage('Copilot Chat RTL is already active.');
+        }
     }
 }
 
@@ -136,7 +163,7 @@ async function handleStatus(): Promise<void> {
 async function handleToggle(): Promise<void> {
     const installations = await findIdeInstallations();
     if (installations.length === 0) {
-        vscode.window.showWarningMessage('Could not locate IDE installation files.');
+            vscode.window.showWarningMessage('Could not locate IDE installation files.');
         return;
     }
 
@@ -174,6 +201,7 @@ async function silentInject(): Promise<boolean> {
     for (const inst of installations) {
         const result = await addRtl(inst);
         if (result.changed) anyChanged = true;
+        if (result.permissionError) showPermissionError(inst.workbenchHtmlPath);
     }
     return anyChanged;
 }
@@ -186,9 +214,11 @@ async function silentReinjectVersion(): Promise<boolean> {
         if (!installed) {
             const result = await addRtl(inst);
             if (result.changed) anyChanged = true;
+            if (result.permissionError) showPermissionError(inst.workbenchHtmlPath);
         } else {
             const result = await reinjectAssets(inst);
             if (result.changed) anyChanged = true;
+            if (result.permissionError) showPermissionError(inst.workbenchHtmlPath);
         }
     }
     return anyChanged;
@@ -263,8 +293,8 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.commands.registerCommand('copilot-rtl.toggle', handleToggle),
     );
 
-    autoReactivate().catch(err => console.error('Copilot RTL auto-reactivate failed:', err));
-    updateStatusBar().catch(err => console.error('Copilot RTL status bar update failed:', err));
+    autoReactivate().catch(err => getOutputChannel().appendLine(`Auto-reactivate error: ${err}`));
+    updateStatusBar().catch(err => getOutputChannel().appendLine(`Status bar error: ${err}`));
 }
 
 export function deactivate(): void {
