@@ -198,7 +198,7 @@ export const RTL_JS = `/* === COPILOT-CHAT-RTL-JS-START === */
         // Find the Chat actions toolbar — aria-label is locale-dependent, try all known translations
         var chatActionsSelectors = [
             '.title-actions ul.actions-container[aria-label="Chat actions"]',
-            '.title-actions ul.actions-container[aria-label="\u05E6\u0027\u05D0\u05D8 \u05E4\u05E2\u05D5\u05DC\u05D5\u05EA"]',
+            '.title-actions ul.actions-container[aria-label="\u05E6\\\u0027\u05D0\u05D8 \u05E4\u05E2\u05D5\u05DC\u05D5\u05EA"]',
             '.title-actions ul.actions-container[aria-label="\u062F\u0631\u062F\u0634\u0629 \u0627\u0644\u0625\u062C\u0631\u0627\u0621\u0627\u062A"]',
             '#workbench\\.parts\\.auxiliarybar > div.composite.title.has-composite-bar.has-actions .title-actions ul.actions-container'
         ];
