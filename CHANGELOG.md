@@ -2,6 +2,12 @@
 
 All notable changes to the **GitHub Copilot Chat RTL Support** extension will be documented in this file.
 
+## [0.1.3] - 2026-04-27
+
+### Fixed
+
+- RTL toggle button not appearing when VS Code is installed in a non-English locale (Hebrew, Arabic, and others) — selector now falls back to DOM structure when `aria-label` doesn't match
+
 ## [0.1.2] - 2026-04-20
 
 ### Fixed
