@@ -2,6 +2,12 @@
 
 All notable changes to the **GitHub Copilot Chat RTL Support** extension will be documented in this file.
 
+## [0.1.4] - 2026-04-27
+
+### Fixed
+
+- Activate RTL now refreshes CSS/JS files even when already installed — ensures users get the latest selectors after upgrading the extension without needing to Turn Off then Turn On
+
 ## [0.1.3] - 2026-04-27
 
 ### Fixed

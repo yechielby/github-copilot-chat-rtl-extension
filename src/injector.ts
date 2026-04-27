@@ -98,10 +98,15 @@ export async function addRtl(installation: IdeInstallation): Promise<{ messages:
     let changed = false;
     let permissionError = false;
 
-    // Check if already installed
+    // Check if already installed — still refresh CSS/JS in case extension was updated
     if (await isInstalled(installation)) {
-        messages.push(`  RTL already installed in ${installation.ideName}`);
-        return { messages, changed, permissionError: false };
+        const reinject = await reinjectAssets(installation);
+        const updated = reinject.messages.some(m => m.includes('Re-written'));
+        messages.push(updated
+            ? `  RTL already installed in ${installation.ideName} — CSS/JS updated to latest version`
+            : `  RTL already installed in ${installation.ideName}`
+        );
+        return { messages, changed: reinject.changed, permissionError: reinject.permissionError };
     }
 
     try {
