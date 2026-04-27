@@ -50,7 +50,7 @@ async function showPermissionError(workbenchPath: string): Promise<void> {
         }
     } else {
         vscode.window.showErrorMessage(
-            'Copilot Chat RTL: Permission denied. Try running VS Code as Administrator.',
+            'Copilot Chat RTL: Permission DENIED. Try running VS Code as Administrator.',
         );
     }
 }
